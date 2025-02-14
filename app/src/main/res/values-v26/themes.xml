@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="custom_button">
+        <item name="android:paddingHorizontal">21dp</item>
+    </style>
+</resources>
