@@ -1,5 +1,6 @@
 package com.geby.listifyapplication
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.geby.listifyapplication.addtask.AddTaskActivity
 import com.geby.listifyapplication.categorycards.CategoryCardAdapter
 import com.geby.listifyapplication.databinding.FragmentHomeBinding
 import com.geby.listifyapplication.taskcard.TaskCardAdapter
@@ -55,6 +57,7 @@ class HomeFragment : Fragment() {
         binding.rvCategoryCard.layoutManager = layoutManager
 
         todayTaskList()
+        addTaskPage()
         return  view
     }
 
@@ -71,4 +74,10 @@ class HomeFragment : Fragment() {
         binding.rvTodayTask.layoutManager = layoutManager
     }
 
+    private fun addTaskPage() {
+        binding.addTaskButton.setOnClickListener {
+            val intent = Intent(requireContext(), AddTaskActivity::class.java)
+            startActivity(intent)
+        }
+    }
 }
