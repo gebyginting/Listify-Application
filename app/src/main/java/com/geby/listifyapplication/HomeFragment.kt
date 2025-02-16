@@ -1,59 +1,74 @@
 package com.geby.listifyapplication
 
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowInsetsController
+import androidx.core.view.WindowCompat
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.geby.listifyapplication.categorycards.CategoryCardAdapter
+import com.geby.listifyapplication.databinding.FragmentHomeBinding
+import com.geby.listifyapplication.taskcard.TaskCardAdapter
+import com.geby.listifyapplication.taskcard.TaskCardDataSource
+import com.geby.quizup.CategoryCardDataSource
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [HomeFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class HomeFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+    private var categoryTitle = ""
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Aktifkan Edge-to-Edge
+        activity?.window?.let { window ->
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.insetsController?.apply {
+                    hide(android.view.WindowInsets.Type.systemBars()) // Sembunyikan status bar
+                    systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+                }
+            }
         }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false)
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        val layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvCategoryCard.layoutManager = layoutManager
+        val cardData = CategoryCardDataSource.getCardData()
+        val adapter = CategoryCardAdapter { category ->
+            this@HomeFragment.categoryTitle = category
+        }
+        binding.rvCategoryCard.adapter = adapter
+        adapter.submitList(cardData)
+        binding.rvCategoryCard.layoutManager = layoutManager
+
+        todayTaskList()
+        return  view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment HomeFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            HomeFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun todayTaskList() {
+        val layoutManager = LinearLayoutManager(requireContext())
+        binding.rvTodayTask.layoutManager = layoutManager
+        val cardData = TaskCardDataSource.getCardData()
+        val limitedData = cardData.take(3)
+        val adapter = TaskCardAdapter { category ->
+            this@HomeFragment.categoryTitle = category
+        }
+        binding.rvTodayTask.adapter = adapter
+        adapter.submitList(limitedData)
+        binding.rvTodayTask.layoutManager = layoutManager
     }
+
 }
