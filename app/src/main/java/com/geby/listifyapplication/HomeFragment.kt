@@ -58,6 +58,7 @@ class HomeFragment : Fragment() {
 
         todayTaskList()
         addTaskPage()
+        seeAllTodayTask()
         return  view
     }
 
@@ -68,6 +69,7 @@ class HomeFragment : Fragment() {
         val limitedData = cardData.take(3)
         val adapter = TaskCardAdapter { category ->
             this@HomeFragment.categoryTitle = category
+
         }
         binding.rvTodayTask.adapter = adapter
         adapter.submitList(limitedData)
@@ -79,5 +81,11 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), AddTaskActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun seeAllTodayTask() {
+        binding.tvButtonseeall.setOnClickListener{
+            val intent = Intent(requireContext(), com.geby.listifyapplication.listpage.ListActivity::class.java)
+            startActivity(intent)        }
     }
 }

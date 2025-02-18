@@ -9,6 +9,12 @@ object TaskCardDataSource {
                 "Meet up with friends", "08.30 AM"
             ), TaskCardData(
                 "Dinner with family", "07.00 PM"
+            ),TaskCardData(
+                "Dinner with family", "07.00 PM"
+            ),TaskCardData(
+                "Dinner with family", "07.00 PM"
+            ),TaskCardData(
+                "Dinner with family", "07.00 PM"
             ),
         )
     }
