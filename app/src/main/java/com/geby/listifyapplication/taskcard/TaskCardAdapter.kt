@@ -1,6 +1,8 @@
 package com.geby.listifyapplication.taskcard
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -9,8 +11,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.geby.listifyapplication.R
 import com.geby.listifyapplication.databinding.TaskCardBinding
+import com.geby.listifyapplication.detail.DetailTaskActivity
 
 class TaskCardAdapter(
+    private val context: Context,
     private val isListPage: Boolean = false,
     private val onItemClick: (String) -> Unit) : ListAdapter<TaskCardData, TaskCardAdapter.MyViewHolder>(DIFF_CALLBACK) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -36,13 +40,15 @@ class TaskCardAdapter(
 
             if (isListPage) {
                 binding.cvItemNote.foreground = ContextCompat.getDrawable(binding.root.context, R.drawable.list_page_task_card)
-//                binding.cvItemNote.setCardBackgroundColor(Color.argb(53, 71, 177, 242))
 
             } else {
                 return
             }
             binding.root.setOnClickListener {
-                onItemClick(card.title)
+                val intent = Intent(binding.root.context, DetailTaskActivity::class.java).apply {
+                    putExtra("TASK_TITLE", card.title)
+                }
+                binding.root.context.startActivity(intent)
             }
         }
     }

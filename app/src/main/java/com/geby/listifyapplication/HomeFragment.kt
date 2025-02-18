@@ -67,7 +67,7 @@ class HomeFragment : Fragment() {
         binding.rvTodayTask.layoutManager = layoutManager
         val cardData = TaskCardDataSource.getCardData()
         val limitedData = cardData.take(3)
-        val adapter = TaskCardAdapter { category ->
+        val adapter = TaskCardAdapter(requireContext()) { category ->
             this@HomeFragment.categoryTitle = category
 
         }

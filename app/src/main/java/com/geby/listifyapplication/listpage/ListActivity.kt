@@ -27,7 +27,7 @@ class ListActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         binding.rvListTask.layoutManager = layoutManager
         val cardData = TaskCardDataSource.getCardData()
-        val adapter = TaskCardAdapter(isListPage = true) { category ->
+        val adapter = TaskCardAdapter(this, isListPage = true) { category ->
             this@ListActivity.categoryTitle = category
         }
         binding.rvListTask.adapter = adapter
