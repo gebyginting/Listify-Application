@@ -9,19 +9,22 @@ import android.view.ViewGroup
 import android.view.WindowInsetsController
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.geby.listifyapplication.addtask.AddTaskActivity
 import com.geby.listifyapplication.categorycards.CategoryCardAdapter
 import com.geby.listifyapplication.databinding.FragmentHomeBinding
+import com.geby.listifyapplication.detail.DetailTaskActivity
 import com.geby.listifyapplication.taskcard.TaskCardAdapter
-import com.geby.listifyapplication.taskcard.TaskCardDataSource
+import com.geby.listifyapplication.utils.ViewModelFactory
 import com.geby.quizup.CategoryCardDataSource
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+    private lateinit var homeViewModel: HomeViewModel
     private var categoryTitle = ""
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,37 +49,42 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        val layoutManager = GridLayoutManager(requireContext(), 2)
-        binding.rvCategoryCard.layoutManager = layoutManager
-        val cardData = CategoryCardDataSource.getCardData()
-        val adapter = CategoryCardAdapter { category ->
-            this@HomeFragment.categoryTitle = category
-        }
-        binding.rvCategoryCard.adapter = adapter
-        adapter.submitList(cardData)
-        binding.rvCategoryCard.layoutManager = layoutManager
+        // ViewModel
+        homeViewModel = obtainViewModel()
 
-        todayTaskList()
-        addTaskPage()
-        seeAllTodayTask()
+        // Setup UI
+        setupCategoryCards()
+        setupTodayTaskList()
+        setupAddTaskButton()
+        setupSeeAllTasksButton()
         return  view
     }
 
-    private fun todayTaskList() {
-        val layoutManager = LinearLayoutManager(requireContext())
-        binding.rvTodayTask.layoutManager = layoutManager
-        val cardData = TaskCardDataSource.getCardData()
-        val limitedData = cardData.take(3)
-        val adapter = TaskCardAdapter(requireContext()) { category ->
-            this@HomeFragment.categoryTitle = category
+    private fun setupCategoryCards() {
+        val layoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvCategoryCard.layoutManager = layoutManager
+
+        val adapter = CategoryCardAdapter { _ ->
 
         }
-        binding.rvTodayTask.adapter = adapter
-        adapter.submitList(limitedData)
-        binding.rvTodayTask.layoutManager = layoutManager
+        binding.rvCategoryCard.adapter = adapter
+        adapter.submitList(CategoryCardDataSource.getCardData())
     }
 
-    private fun addTaskPage() {
+    private fun setupTodayTaskList() {
+        binding.rvTodayTask.layoutManager = LinearLayoutManager(requireContext())
+        val adapter = TaskCardAdapter(requireContext()) { taskTitle ->
+            val intent = Intent(requireContext(), DetailTaskActivity::class.java)
+            intent.putExtra("TASK_TITLE", taskTitle)
+            startActivity(intent)
+        }
+        binding.rvTodayTask.adapter = adapter
+        // **Ambil Data dari ViewModel**
+        homeViewModel.getAllTasks().observe(viewLifecycleOwner) { taskList ->
+            adapter.submitList(taskList.take(3)) // Hanya ambil 3 tugas pertama
+        }    }
+
+    private fun setupAddTaskButton() {
         binding.addTaskButton.setOnClickListener {
             val intent = Intent(requireContext(), AddTaskActivity::class.java)
             startActivity(intent)
@@ -88,4 +96,23 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), com.geby.listifyapplication.listpage.ListActivity::class.java)
             startActivity(intent)        }
     }
+
+    private fun setupSeeAllTasksButton() {
+        binding.tvButtonseeall.setOnClickListener {
+            val intent = Intent(requireContext(), com.geby.listifyapplication.listpage.ListActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun obtainViewModel(): HomeViewModel {
+        val factory = ViewModelFactory.getInstance(requireActivity().application)
+        return ViewModelProvider(this, factory)[HomeViewModel::class.java]
+    }
+
+    //    agar tidak memory leak
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }

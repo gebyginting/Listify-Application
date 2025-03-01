@@ -27,9 +27,9 @@ class CategoryCardAdapter(private val onItemClick: (String) -> Unit) : ListAdapt
             binding.tvCategoryStatus.text = card.title
             binding.tvCategoryCount.text = "${card.count} tasks"
 
-            binding.root.setOnClickListener {
-                onItemClick(card.title)
-            }
+//            binding.root.setOnClickListener {
+//                onItemClick(card.title)
+//            }
         }
     }
 
