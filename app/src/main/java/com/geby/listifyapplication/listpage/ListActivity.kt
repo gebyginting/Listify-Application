@@ -1,6 +1,7 @@
 package com.geby.listifyapplication.listpage
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -42,7 +43,11 @@ class ListActivity : AppCompatActivity() {
  
     private fun observeTaskList() {
         listViewModel.getAllTasks().observe(this) { taskList ->
-            (binding.rvListTask.adapter as TaskCardAdapter).submitList(taskList)
+            if (taskList.isNotEmpty()) {
+                (binding.rvListTask.adapter as TaskCardAdapter).submitList(taskList)
+            } else {
+                binding.tvNotaskmessage.visibility = View.VISIBLE
+            }
         }
     }
 }

@@ -205,5 +205,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.95" />
 
+    <TextView
+        android:id="@+id/tv_notaskmessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="No Task Today"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline6"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/tv6" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,5 @@
 package com.geby.listifyapplication.addtask
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -8,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.geby.listifyapplication.HomeViewModel
-import com.geby.listifyapplication.MainActivity
 import com.geby.listifyapplication.database.Task
 import com.geby.listifyapplication.databinding.ActivityAddTaskBinding
 import com.geby.listifyapplication.utils.ViewModelFactory
@@ -41,18 +39,6 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
 
         homeViewModel = obtainViewModel(this@AddTaskActivity)
 
-//        binding.createButton.setOnClickListener {
-//
-//            task = (task ?: Task()).apply {
-//                title = "Dummy task 1"
-//                description = "Dummy description 1"
-//                status = "On Going"
-//                date = DateHelper.getCurrentDate()
-//            }
-//            homeViewModel.add(task as Task)
-//            showToast("Task berhasil ditambahkan")
-//        }
-
         setSchedule()
         addTask()
     }
@@ -62,20 +48,18 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
             createButton.setOnClickListener {
                 val title = taskNameEditText.text.toString()
                 val description = descriptionEditText.text.toString()
-                val status = "On Going"
 
                 when {
                     title.isEmpty() -> taskNameEditText.error = "Tidak boleh kosong"
                     description.isEmpty() -> descriptionEditText.error = "Tidak boleh kosong"
-                    schedule == null -> showToast("Task harus dijadwalkan") // Cek schedule kosong
+                    schedule == null -> showToast("Task harus dijadwalkan")
                     else -> {
                         if (!::task.isInitialized) {
-                            task = Task(0, title, description, status, schedule.toString())
+                            task = Task(0, title, description, schedule.toString())
                         } else {
                             task.apply {
                                 this.title = title
                                 this.description = description
-                                this.status = status
                                 this.date = schedule.toString()
                             }
                         }
@@ -91,9 +75,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                         )
 
                         showToast("Task berhasil ditambahkan")
-                        val intent = Intent(this@AddTaskActivity, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                        startActivity(intent)
+                        //setResult(Activity.RESULT_OK)
                         finish()
                     }
                 }
@@ -150,7 +132,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     private fun combineDateTime() {
         if (scheduledDate.isNotEmpty() && scheduledTime.isNotEmpty()) {
             val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-            dateTimeFormat.timeZone = TimeZone.getDefault() // Atur timezone ke default (lokal)
+            dateTimeFormat.timeZone = TimeZone.getDefault()
 
             val dateTimeString = "$scheduledDate $scheduledTime"
             schedule = dateTimeFormat.parse(dateTimeString)
@@ -161,6 +143,5 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     companion object {
         private const val DATE_PICKER_TAG = "DatePicker"
         private const val TIME_PICKER_ONCE_TAG = "TimePickerOnce"
-        private const val TIME_PICKER_REPEAT_TAG = "TimePickerRepeat"
     }
 }

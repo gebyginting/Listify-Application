@@ -19,6 +19,8 @@ class TaskRepository(application: Application) {
 
     fun getAllTasks(): LiveData<List<Task>> = mTasksDao.getAllNotes()
 
+    fun getTaskById(taskId: Int): LiveData<Task> = mTasksDao.getTaskById(taskId)
+
     fun add(task: Task) {
         executorService.execute { mTasksDao.add(task) }
     }

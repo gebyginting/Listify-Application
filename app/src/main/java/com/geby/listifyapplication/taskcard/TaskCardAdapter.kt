@@ -57,7 +57,7 @@ class TaskCardAdapter(
             }
             binding.root.setOnClickListener {
                 val intent = Intent(binding.root.context, DetailTaskActivity::class.java).apply {
-                    putExtra("TASK_TITLE", card.title)
+                    putExtra("TASK_ID", card.id)
                 }
                 binding.root.context.startActivity(intent)
             }

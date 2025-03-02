@@ -18,7 +18,7 @@ class Task (
     var description: String? = null,
 
     @field:ColumnInfo(name = "status")
-    var status: String? = null,
+    var status: String? = "On Going",
 
     @field:ColumnInfo(name = "date")
     var date: String? = null

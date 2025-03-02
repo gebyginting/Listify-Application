@@ -81,7 +81,11 @@ class HomeFragment : Fragment() {
         binding.rvTodayTask.adapter = adapter
         // **Ambil Data dari ViewModel**
         homeViewModel.getAllTasks().observe(viewLifecycleOwner) { taskList ->
-            adapter.submitList(taskList.take(3)) // Hanya ambil 3 tugas pertama
+            if (taskList.isNotEmpty()) {
+                adapter.submitList(taskList.take(3)) // Hanya ambil 3 tugas pertama
+            } else {
+                binding.tvNotaskmessage.visibility = View.VISIBLE
+            }
         }    }
 
     private fun setupAddTaskButton() {
@@ -89,12 +93,6 @@ class HomeFragment : Fragment() {
             val intent = Intent(requireContext(), AddTaskActivity::class.java)
             startActivity(intent)
         }
-    }
-
-    private fun seeAllTodayTask() {
-        binding.tvButtonseeall.setOnClickListener{
-            val intent = Intent(requireContext(), com.geby.listifyapplication.listpage.ListActivity::class.java)
-            startActivity(intent)        }
     }
 
     private fun setupSeeAllTasksButton() {
@@ -114,5 +112,18 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (requestCode == REQUEST_ADD_TASK && resultCode == Activity.RESULT_OK) {
+//            // ✅ Perbarui daftar task setelah kembali dari AddTaskActivity
+//            homeViewModel.getAllTasks()
+//        }
+//    }
+
+//    companion object {
+//        const val REQUEST_ADD_TASK = 1
+//    }
+
 
 }

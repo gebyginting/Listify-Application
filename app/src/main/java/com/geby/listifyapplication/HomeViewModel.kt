@@ -11,6 +11,9 @@ class HomeViewModel(application: Application) : ViewModel() {
     private val mTaskRepository: TaskRepository = TaskRepository(application)
 
     fun getAllTasks(): LiveData<List<Task>> = mTaskRepository.getAllTasks()
+
+    fun getTaskById(taskId: Int): LiveData<Task> = mTaskRepository.getTaskById(taskId)
+
     fun add(task: Task) {
         mTaskRepository.add(task)
     }
