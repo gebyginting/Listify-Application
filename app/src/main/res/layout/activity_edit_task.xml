@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".detail.DetailTaskActivity">
+    tools:context=".edit.EditTaskActivity">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline4"
@@ -29,30 +29,11 @@
         app:layout_constraintGuide_percent="0.05" />
 
     <ImageButton
-        android:id="@+id/backButton"
+        android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:src="@drawable/arrow_back_icon"
-        app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
-
-    <ImageButton
-        android:id="@+id/editButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:background="@android:color/transparent"
-        android:src="@drawable/edit_icon"
-        app:layout_constraintEnd_toStartOf="@+id/deleteButton"
-        app:layout_constraintTop_toTopOf="@+id/guideline8" />
-
-    <ImageButton
-        android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/close_icon"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="@+id/guideline8" />
 
@@ -60,32 +41,25 @@
         android:id="@+id/textView3"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Your Detail Task"
+        android:layout_marginTop="8dp"
+        android:text="Edit Your Task"
         android:textColor="@color/grey"
-        app:layout_constraintEnd_toStartOf="@+id/tv_taskstatus"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/backButton" />
+        app:layout_constraintTop_toBottomOf="@+id/closeButton" />
 
-    <TextView
-        android:id="@+id/tv_taskstatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/outfit_semibold"
-        android:text="Status"
-        android:textColor="#29D91C"
-        app:layout_constraintEnd_toStartOf="@+id/guideline7"
-        app:layout_constraintTop_toTopOf="@+id/textView3" />
-
-    <TextView
-        android:id="@+id/tv_taskname"
-        style="@style/page_title"
+    <EditText
+        android:id="@+id/taskName_editText"
+        style="@style/editTaskName"
+        android:background="@drawable/edit_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:maxLines="2"
+        android:padding="12dp"
         android:text="Meet up with friends"
+        android:inputType="text"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
@@ -97,7 +71,7 @@
         android:layout_marginTop="24dp"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/tv_taskname"
+        app:layout_constraintTop_toBottomOf="@+id/taskName_editText"
         app:srcCompat="@drawable/task_detail_img" />
 
     <TextView
@@ -111,13 +85,21 @@
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
-    <TextView
-        android:id="@+id/tv_description"
+    <EditText
+        android:id="@+id/description_editText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:fontFamily="@font/outfit_semibold"
         android:justificationMode="inter_character"
+        android:background="@drawable/edit_text"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:minLines="3"
+        android:padding="12dp"
+        android:scrollbars="vertical"
+        android:textSize="12sp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur accumsan diam porttitor elit eleifend suscipit ac nec elit. Vivamus ac massa gravida, ultrices massa eget."
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
@@ -132,31 +114,59 @@
         android:textColor="@color/grey"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/tv_description" />
+        app:layout_constraintTop_toBottomOf="@+id/description_editText" />
 
-    <TextView
-        android:id="@+id/tv_date"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/date_editText"
+        style="@style/editTaskDate"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/bg_date"
-        android:padding="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/edit_text"
+        android:clickable="true"
+        android:cursorVisible="false"
+        android:drawableEnd="@drawable/calender_icon"
+        android:focusable="false"
+        android:importantForAutofill="no"
+        android:padding="11dp"
         android:text="02 February 2025"
-        android:textColor="@android:color/black"
-        android:fontFamily="@font/outfit_semibold"
+        app:layout_constraintEnd_toStartOf="@+id/time_editText"
+        app:layout_constraintHorizontal_weight="2"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
-    <TextView
-        android:id="@+id/tv_time"
+    <EditText
+        android:id="@+id/time_editText"
+        style="@style/editTaskDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edit_text"
+        android:clickable="true"
+        android:cursorVisible="false"
+        android:drawableEnd="@drawable/arrow_down_icon"
+        android:focusable="false"
+        android:text="12.15 PM"
+        android:importantForAutofill="no"
+        android:padding="11dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/date_editText"
+        app:layout_constraintTop_toTopOf="@+id/date_editText" />
+
+    <Button
+        android:id="@+id/updateButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:background="@drawable/bg_time"
-        android:padding="12dp"
-        android:text="12.15 PM"
-        android:textColor="@android:color/black"
-        android:fontFamily="@font/outfit_semibold"
-        app:layout_constraintStart_toEndOf="@+id/tv_date"
-        app:layout_constraintTop_toTopOf="@+id/tv_date" />
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/custom_button"
+        android:fontFamily="@font/outfit_bold"
+        android:paddingHorizontal="80dp"
+        android:text="Update"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toBottomOf="@+id/date_editText" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

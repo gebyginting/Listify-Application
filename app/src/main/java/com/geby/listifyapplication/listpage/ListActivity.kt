@@ -14,7 +14,7 @@ import com.geby.listifyapplication.utils.ViewModelFactory
 class ListActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityListBinding
-    private var categoryTitle = ""
+    private lateinit var adapter: TaskCardAdapter
 
     // Menggunakan ViewModel dengan ViewModelFactory
     private val listViewModel: HomeViewModel by viewModels {
@@ -28,26 +28,21 @@ class ListActivity : AppCompatActivity() {
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupRecyclerView()
         observeTaskList()
+        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {
         binding.rvListTask.layoutManager = LinearLayoutManager(this)
 
-        val adapter = TaskCardAdapter(this, isListPage = true) { taskTitle ->
-            this@ListActivity.categoryTitle = taskTitle
-        }
+        adapter = TaskCardAdapter(isListPage = true)
         binding.rvListTask.adapter = adapter
     }
- 
+
     private fun observeTaskList() {
-        listViewModel.getAllTasks().observe(this) { taskList ->
-            if (taskList.isNotEmpty()) {
-                (binding.rvListTask.adapter as TaskCardAdapter).submitList(taskList)
-            } else {
-                binding.tvNotaskmessage.visibility = View.VISIBLE
-            }
+        listViewModel.getAllTasks().observe(this@ListActivity) { taskList ->
+            adapter.submitList(taskList)
+            binding.tvNotaskmessage.visibility = if (taskList.isEmpty()) View.VISIBLE else View.GONE
         }
     }
 }

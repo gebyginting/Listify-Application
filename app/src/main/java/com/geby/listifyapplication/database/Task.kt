@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Suppress("DEPRECATED_ANNOTATION")
 @Entity
-class Task (
+data class Task (
     @field:PrimaryKey(autoGenerate = true)
     @field:ColumnInfo(name = "id")
     var id: Int = 0,

@@ -3,19 +3,19 @@ package com.geby.listifyapplication
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsetsController
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.geby.listifyapplication.addtask.AddTaskActivity
 import com.geby.listifyapplication.categorycards.CategoryCardAdapter
 import com.geby.listifyapplication.databinding.FragmentHomeBinding
-import com.geby.listifyapplication.detail.DetailTaskActivity
 import com.geby.listifyapplication.taskcard.TaskCardAdapter
 import com.geby.listifyapplication.utils.ViewModelFactory
 import com.geby.quizup.CategoryCardDataSource
@@ -24,13 +24,13 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var homeViewModel: HomeViewModel
-    private var categoryTitle = ""
+    private val homeViewModel: HomeViewModel by viewModels {
+        ViewModelFactory.getInstance(requireActivity().application)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Aktifkan Edge-to-Edge
         activity?.window?.let { window ->
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -49,15 +49,12 @@ class HomeFragment : Fragment() {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val view = binding.root
 
-        // ViewModel
-        homeViewModel = obtainViewModel()
-
         // Setup UI
         setupCategoryCards()
         setupTodayTaskList()
         setupAddTaskButton()
         setupSeeAllTasksButton()
-        return  view
+        return view
     }
 
     private fun setupCategoryCards() {
@@ -72,21 +69,17 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupTodayTaskList() {
+        val adapter = TaskCardAdapter()
         binding.rvTodayTask.layoutManager = LinearLayoutManager(requireContext())
-        val adapter = TaskCardAdapter(requireContext()) { taskTitle ->
-            val intent = Intent(requireContext(), DetailTaskActivity::class.java)
-            intent.putExtra("TASK_TITLE", taskTitle)
-            startActivity(intent)
-        }
-        binding.rvTodayTask.adapter = adapter
-        // **Ambil Data dari ViewModel**
+        binding.rvTodayTask.adapter = adapter // Set adapter lebih awal
+
         homeViewModel.getAllTasks().observe(viewLifecycleOwner) { taskList ->
-            if (taskList.isNotEmpty()) {
-                adapter.submitList(taskList.take(3)) // Hanya ambil 3 tugas pertama
-            } else {
-                binding.tvNotaskmessage.visibility = View.VISIBLE
-            }
-        }    }
+            Log.d("DEBUG", "Task List: ${taskList.map { it.title }}")
+            adapter.submitList(taskList.take(3))
+            binding.tvNotaskmessage.visibility = if (taskList.isEmpty()) View.VISIBLE else View.GONE
+        }
+    }
+
 
     private fun setupAddTaskButton() {
         binding.addTaskButton.setOnClickListener {
@@ -102,28 +95,10 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun obtainViewModel(): HomeViewModel {
-        val factory = ViewModelFactory.getInstance(requireActivity().application)
-        return ViewModelProvider(this, factory)[HomeViewModel::class.java]
-    }
-
     //    agar tidak memory leak
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (requestCode == REQUEST_ADD_TASK && resultCode == Activity.RESULT_OK) {
-//            // ✅ Perbarui daftar task setelah kembali dari AddTaskActivity
-//            homeViewModel.getAllTasks()
-//        }
-//    }
-
-//    companion object {
-//        const val REQUEST_ADD_TASK = 1
-//    }
-
 
 }

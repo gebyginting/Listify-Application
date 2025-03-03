@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.geby.listifyapplication.HomeViewModel
 import com.geby.listifyapplication.database.Task
 import com.geby.listifyapplication.databinding.ActivityAddTaskBinding
@@ -22,7 +22,9 @@ import java.util.TimeZone
 class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener, TimePickerFragment.DialogTimeListener {
 
     private lateinit var binding: ActivityAddTaskBinding
-    private lateinit var homeViewModel: HomeViewModel
+    private val homeViewModel: HomeViewModel by viewModels {
+        ViewModelFactory.getInstance(application)
+    }
     private lateinit var task: Task
 
     // alarm receiver
@@ -36,8 +38,6 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
         enableEdgeToEdge()
         binding = ActivityAddTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        homeViewModel = obtainViewModel(this@AddTaskActivity)
 
         setSchedule()
         addTask()
@@ -54,15 +54,11 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                     description.isEmpty() -> descriptionEditText.error = "Tidak boleh kosong"
                     schedule == null -> showToast("Task harus dijadwalkan")
                     else -> {
-                        if (!::task.isInitialized) {
-                            task = Task(0, title, description, schedule.toString())
-                        } else {
-                            task.apply {
-                                this.title = title
-                                this.description = description
-                                this.date = schedule.toString()
-                            }
-                        }
+                        task = Task(
+                            title = title,
+                            description = description,
+                            date = schedule.toString()
+                        )
 
                         homeViewModel.add(task)
 
@@ -75,17 +71,11 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                         )
 
                         showToast("Task berhasil ditambahkan")
-                        //setResult(Activity.RESULT_OK)
                         finish()
                     }
                 }
             }
         }
-    }
-
-    private fun obtainViewModel(activity: AppCompatActivity): HomeViewModel {
-        val factory = ViewModelFactory.getInstance(activity.application)
-        return ViewModelProvider(activity, factory)[HomeViewModel::class.java]
     }
 
     private fun showToast(message: String) {

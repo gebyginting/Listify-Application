@@ -10,9 +10,8 @@ import androidx.room.Update
 
 @Dao
 interface TaskDao {
-
     @Query("Select * from task ORDER BY id ASC")
-    fun getAllNotes(): LiveData<List<Task>>
+    fun getAllTasks(): LiveData<List<Task>>
 
     @Query("SELECT * FROM task WHERE id = :taskId")
     fun getTaskById(taskId: Int): LiveData<Task>

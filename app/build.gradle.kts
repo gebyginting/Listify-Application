@@ -55,6 +55,7 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     ksp(libs.room.compiler)
+    implementation(libs.androidx.room.room.ktx)
 
     implementation("de.hdodenhof:circleimageview:3.1.0")
 }

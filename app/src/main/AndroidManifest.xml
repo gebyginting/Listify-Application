@@ -18,6 +18,9 @@
         android:theme="@style/Theme.ListifyApplication"
         tools:targetApi="31">
         <activity
+            android:name=".edit.EditTaskActivity"
+            android:exported="false" />
+        <activity
             android:name=".detail.DetailTaskActivity"
             android:exported="false" />
         <activity

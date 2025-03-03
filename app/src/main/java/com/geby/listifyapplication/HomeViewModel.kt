@@ -17,4 +17,12 @@ class HomeViewModel(application: Application) : ViewModel() {
     fun add(task: Task) {
         mTaskRepository.add(task)
     }
+
+    fun update(task: Task) {
+        mTaskRepository.update(task)
+    }
+
+    fun delete(task: Task) {
+        mTaskRepository.delete(task)
+    }
 }
