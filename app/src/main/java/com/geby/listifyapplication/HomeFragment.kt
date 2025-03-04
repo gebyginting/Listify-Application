@@ -16,9 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.geby.listifyapplication.addtask.AddTaskActivity
 import com.geby.listifyapplication.categorycards.CategoryCardAdapter
 import com.geby.listifyapplication.databinding.FragmentHomeBinding
+import com.geby.listifyapplication.listpage.ListActivity
 import com.geby.listifyapplication.taskcard.TaskCardAdapter
 import com.geby.listifyapplication.utils.ViewModelFactory
-import com.geby.quizup.CategoryCardDataSource
 
 class HomeFragment : Fragment() {
 
@@ -61,25 +61,33 @@ class HomeFragment : Fragment() {
         val layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvCategoryCard.layoutManager = layoutManager
 
-        val adapter = CategoryCardAdapter { _ ->
-
+        val adapter = CategoryCardAdapter { selectedStatus ->
+            // Pindah ke fragment atau activity yang menampilkan task berdasarkan status
+            val intent = Intent(requireContext(), ListActivity::class.java).apply {
+                putExtra("TASK_STATUS", selectedStatus)
+            }
+            startActivity(intent)
         }
         binding.rvCategoryCard.adapter = adapter
-        adapter.submitList(CategoryCardDataSource.getCardData())
+
+        homeViewModel.getCategoryCards().observe(viewLifecycleOwner) { categoryList ->
+            adapter.submitList(categoryList)
+        }
     }
 
     private fun setupTodayTaskList() {
-        val adapter = TaskCardAdapter()
+        val adapter = TaskCardAdapter { selectedTask ->
+            homeViewModel.update(selectedTask)
+        }
         binding.rvTodayTask.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvTodayTask.adapter = adapter // Set adapter lebih awal
+        binding.rvTodayTask.adapter = adapter
 
-        homeViewModel.getAllTasks().observe(viewLifecycleOwner) { taskList ->
+        homeViewModel.getAllTasksByCategory("On Going").observe(viewLifecycleOwner) { taskList ->
             Log.d("DEBUG", "Task List: ${taskList.map { it.title }}")
             adapter.submitList(taskList.take(3))
             binding.tvNotaskmessage.visibility = if (taskList.isEmpty()) View.VISIBLE else View.GONE
         }
     }
-
 
     private fun setupAddTaskButton() {
         binding.addTaskButton.setOnClickListener {

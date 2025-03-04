@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,11 +17,13 @@ import com.geby.listifyapplication.detail.DetailTaskActivity
 import com.geby.listifyapplication.utils.DateHelper
 
 class TaskCardAdapter(
-    private val isListPage: Boolean = false) : ListAdapter<Task, TaskCardAdapter.MyViewHolder>(DIFF_CALLBACK) {
+    private val isListPage: Boolean = false,
+    private val onTaskCompleted: (Task) -> Unit
+) : ListAdapter<Task, TaskCardAdapter.MyViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val binding = TaskCardBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return MyViewHolder(binding, isListPage)
+        return MyViewHolder(binding, isListPage, onTaskCompleted)
     }
 
 
@@ -30,7 +34,8 @@ class TaskCardAdapter(
 
     class MyViewHolder(
         private val binding: TaskCardBinding,
-        private val isListPage: Boolean 
+        private val isListPage: Boolean,
+        private val onTaskCompleted: (Task) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
@@ -42,12 +47,32 @@ class TaskCardAdapter(
                 binding.cvItemNote.foreground = ContextCompat.getDrawable(binding.root.context, R.drawable.list_page_task_card)
 
             }
+
+            binding.root.setOnLongClickListener {
+                showConfirmationDialog(task)
+                true
+            }
+
             binding.root.setOnClickListener {
                 val intent = Intent(binding.root.context, DetailTaskActivity::class.java).apply {
                     putExtra("TASK_ID", task.id)
                 }
                 binding.root.context.startActivity(intent)
             }
+        }
+
+        private fun showConfirmationDialog(task: Task) {
+            val context = binding.root.context
+            AlertDialog.Builder(context)
+                .setTitle("Mark as Completed")
+                .setMessage("Are you sure you want to mark this task as completed?")
+                .setPositiveButton("Yes") { _, _ ->
+                    val updatedTask = task.copy(status = "Completed")
+                    onTaskCompleted(updatedTask)
+                    Toast.makeText(context, "Task marked as completed", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("No", null)
+                .show()
         }
     }
 

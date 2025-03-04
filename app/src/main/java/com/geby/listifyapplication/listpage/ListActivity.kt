@@ -15,6 +15,7 @@ class ListActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityListBinding
     private lateinit var adapter: TaskCardAdapter
+    private lateinit var status: String
 
     // Menggunakan ViewModel dengan ViewModelFactory
     private val listViewModel: HomeViewModel by viewModels {
@@ -28,6 +29,8 @@ class ListActivity : AppCompatActivity() {
         binding = ActivityListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        status = intent.getStringExtra("TASK_STATUS") ?: "On Going" // Default jika null
+
         observeTaskList()
         setupRecyclerView()
     }
@@ -35,14 +38,18 @@ class ListActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         binding.rvListTask.layoutManager = LinearLayoutManager(this)
 
-        adapter = TaskCardAdapter(isListPage = true)
+        adapter = TaskCardAdapter(isListPage = true) { selectedTask ->
+            listViewModel.update(selectedTask)
+        }
         binding.rvListTask.adapter = adapter
     }
 
     private fun observeTaskList() {
-        listViewModel.getAllTasks().observe(this@ListActivity) { taskList ->
+        listViewModel.getAllTasksByCategory(status).observe(this) { taskList ->
             adapter.submitList(taskList)
             binding.tvNotaskmessage.visibility = if (taskList.isEmpty()) View.VISIBLE else View.GONE
         }
+        // Tampilkan judul berdasarkan kategori
+        binding.tvPageTitle.text = "$status List"
     }
 }

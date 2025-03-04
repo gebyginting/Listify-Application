@@ -28,6 +28,17 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.05" />
 
+    <TextView
+        android:id="@+id/tv_pageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/outfit_semibold"
+        android:text="Edit Task"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline7"
+        app:layout_constraintStart_toStartOf="@+id/guideline4"
+        app:layout_constraintTop_toTopOf="@+id/guideline8" />
+
     <ImageButton
         android:id="@+id/closeButton"
         android:layout_width="wrap_content"
@@ -42,12 +53,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Edit Your Task"
+        android:text="Your task name"
         android:textColor="@color/grey"
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline4"
-        app:layout_constraintTop_toBottomOf="@+id/closeButton" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_pageTitle" />
 
     <EditText
         android:id="@+id/taskName_editText"
@@ -95,11 +106,11 @@
         android:background="@drawable/edit_text"
         android:gravity="top|start"
         android:inputType="textMultiLine"
-        android:maxLines="3"
-        android:minLines="3"
-        android:padding="12dp"
-        android:scrollbars="vertical"
-        android:textSize="12sp"
+        android:maxLines="4"
+        android:minLines="4"
+        android:padding="15dp"
+        android:scrollbars="none"
+        android:textSize="14sp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur accumsan diam porttitor elit eleifend suscipit ac nec elit. Vivamus ac massa gravida, ultrices massa eget."
         app:layout_constraintEnd_toStartOf="@+id/guideline7"
         app:layout_constraintStart_toStartOf="@+id/guideline4"

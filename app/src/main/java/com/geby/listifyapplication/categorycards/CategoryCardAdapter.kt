@@ -27,19 +27,19 @@ class CategoryCardAdapter(private val onItemClick: (String) -> Unit) : ListAdapt
             binding.tvCategoryStatus.text = card.title
             binding.tvCategoryCount.text = "${card.count} tasks"
 
-//            binding.root.setOnClickListener {
-//                onItemClick(card.title)
-//            }
+            binding.root.setOnClickListener {
+                onItemClick(card.title)
+            }
         }
     }
 
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<CategoryCardData>() {
             override fun areItemsTheSame(oldItem: CategoryCardData, newItem: CategoryCardData): Boolean {
-                return oldItem.title == newItem.title
+                return oldItem == newItem
             }
             override fun areContentsTheSame(oldItem: CategoryCardData, newItem: CategoryCardData): Boolean {
-                return oldItem.title == newItem.title
+                return oldItem == newItem
             }
         }
     }
