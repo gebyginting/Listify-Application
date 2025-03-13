@@ -42,7 +42,7 @@
                     android:textSize="20sp"/>
 
                 <TextView
-                    android:id="@+id/v_description"
+                    android:id="@+id/tv_totaltodaytask"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="You have 5 tasks today"
@@ -95,16 +95,18 @@
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/tv_upcomingtask"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Continue CRUD Project"
+                        tools:text="Upcoming task name"
                         android:textColor="@color/white"
                         android:textSize="12sp"/>
 
                     <TextView
+                        android:id="@+id/tv_upcomingtaskdate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="12.30 PM"
+                        tools:text="Upcoming task date"
                         android:textColor="@color/white"
                         android:textSize="14sp"/>
                 </LinearLayout>

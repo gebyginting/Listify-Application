@@ -1,4 +1,4 @@
-package com.geby.workoutreminderapp.utils
+package com.geby.listifyapplication.utils
 import android.app.AlarmManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -7,11 +7,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.geby.listifyapplication.R
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -22,24 +25,18 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val type = intent.getStringExtra(EXTRA_TYPE)
         val message = intent.getStringExtra(EXTRA_MESSAGE)
+        Log.d("AlarmReceiver", "Received alarm: $message")
 
         val title =
             if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) TYPE_ONE_TIME else TYPE_REPEATING
         val notifId =
             if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) ID_ONETIME else ID_REPEATING
 
-        //Jika Anda ingin menampilkan dengan toast anda bisa menghilangkan komentar pada baris dibawah ini.
-//        showToast(context, title, message)
+        Log.e("ALARM_RECEIVER", "Broadcast diterima: $title - $message")
 
         if (message != null) {
             showAlarmNotification(context, title, message, notifId)
         }
-    }
-
-    // Gunakan metode ini untuk menampilkan toast
-
-    private fun showToast(context: Context, title: String, message: String?) {
-        Toast.makeText(context, "$title : $message", Toast.LENGTH_LONG).show()
     }
 
     // Gunakan metode ini untuk menampilkan notifikasi
@@ -57,6 +54,7 @@ class AlarmReceiver : BroadcastReceiver() {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val builder = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.time_icon)
             .setContentTitle(title)
             .setContentText(message)
             .setColor(ContextCompat.getColor(context, android.R.color.transparent))
@@ -90,8 +88,6 @@ class AlarmReceiver : BroadcastReceiver() {
 
     }
 
-    // Metode ini digunakan untuk menjalankan alarm one time
-
     fun setOneTimeAlarm(
         context: Context,
         type: String,
@@ -99,92 +95,54 @@ class AlarmReceiver : BroadcastReceiver() {
         time: String,
         message: String
     ) {
-
-        // Validasi inputan date dan time terlebih dahulu
         if (isDateInvalid(date, DATE_FORMAT) || isDateInvalid(time, TIME_FORMAT)) return
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        intent.putExtra(EXTRA_MESSAGE, message)
-        intent.putExtra(EXTRA_TYPE, type)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
+            requestExactAlarmPermission(context)
+            return
+        }
 
-        Log.e("ONE TIME", "$date $time")
+        val intent = Intent(context, AlarmReceiver::class.java).apply {
+            putExtra(EXTRA_MESSAGE, message)
+            putExtra(EXTRA_TYPE, type)
+        }
+
         val dateArray = date.split("-").toTypedArray()
         val timeArray = time.split(":").toTypedArray()
 
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.YEAR, Integer.parseInt(dateArray[0]))
-        calendar.set(Calendar.MONTH, Integer.parseInt(dateArray[1]) - 1)
-        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dateArray[2]))
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]))
-        calendar.set(Calendar.MINUTE, Integer.parseInt(timeArray[1]))
-        calendar.set(Calendar.SECOND, 0)
+        val calendar = Calendar.getInstance().apply {
+            set(Calendar.YEAR, dateArray[0].toInt())
+            set(Calendar.MONTH, dateArray[1].toInt() - 1)
+            set(Calendar.DAY_OF_MONTH, dateArray[2].toInt())
+            set(Calendar.HOUR_OF_DAY, timeArray[0].toInt())
+            set(Calendar.MINUTE, timeArray[1].toInt())
+            set(Calendar.SECOND, 0)
+        }
+
+        val uniqueId = System.currentTimeMillis().toInt()
 
         val pendingIntent = PendingIntent.getBroadcast(
             context,
-            ID_ONETIME,
+            uniqueId,
             intent,
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
 
-        Toast.makeText(context, "One time alarm set up", Toast.LENGTH_SHORT).show()
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+
+        Toast.makeText(context, "One-time alarm set for $date $time", Toast.LENGTH_SHORT).show()
     }
 
-    // Metode ini digunakan untuk menjalankan alarm repeating
-    fun setRepeatingAlarm(context: Context, type: String, time: String, message: String) {
-
-        // Validasi inputan waktu terlebih dahulu
-        if (isDateInvalid(time, TIME_FORMAT)) return
-
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        intent.putExtra(EXTRA_MESSAGE, message)
-        intent.putExtra(EXTRA_TYPE, type)
-
-        val timeArray = time.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(timeArray[0]))
-        calendar.set(Calendar.MINUTE, Integer.parseInt(timeArray[1]))
-        calendar.set(Calendar.SECOND, 0)
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            ID_REPEATING,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        alarmManager.setInexactRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
-
-        Toast.makeText(context, "Repeating alarm set up", Toast.LENGTH_SHORT).show()
-    }
-
-
-    fun cancelAlarm(context: Context, type: String) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmReceiver::class.java)
-        val requestCode =
-            if (type.equals(TYPE_ONE_TIME, ignoreCase = true)) ID_ONETIME else ID_REPEATING
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        if (pendingIntent != null) {
-            pendingIntent.cancel()
-            alarmManager.cancel(pendingIntent)
-            Toast.makeText(context, "Repeating alarm dibatalkan", Toast.LENGTH_SHORT).show()
+    private fun requestExactAlarmPermission(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                data = Uri.parse("package:${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
         }
     }
-
 
     // Metode ini digunakan untuk validasi date dan time
     private fun isDateInvalid(date: String, format: String): Boolean {

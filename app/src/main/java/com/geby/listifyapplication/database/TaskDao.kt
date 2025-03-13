@@ -13,7 +13,7 @@ interface TaskDao {
     @Query("Select * from task ORDER BY id ASC")
     fun getAllTasks(): LiveData<List<Task>>
 
-    @Query("Select * from task WHERE status = :status ORDER BY id ASC")
+    @Query("Select * from task WHERE status = :status ORDER BY id DESC")
     fun getAllTasksByCategory(status: String): LiveData<List<Task>>
 
     @Query("SELECT * FROM task WHERE id = :taskId")
@@ -24,6 +24,9 @@ interface TaskDao {
 
     @Update
     fun update(task: Task)
+
+    @Query("UPDATE task SET status = 'Not Done' WHERE date < :currentTime AND status == 'On Going'")
+    fun updateExpiredTasks(currentTime: String)
 
     @Delete
     fun delete(task: Task)

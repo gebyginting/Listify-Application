@@ -1,4 +1,4 @@
-package com.geby.workoutreminderapp.utils
+package com.geby.listifyapplication.utils
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -8,7 +8,6 @@ import com.geby.listifyapplication.database.Task
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import java.util.UUID
 
 class AlarmScheduler {
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.getDefault())
@@ -21,8 +20,10 @@ class AlarmScheduler {
 
             try {
                 // Konversi scheduledDate dari String ke Date
-                val date = dateFormat.parse(task.date)
-                calendar.time = date
+                val date = task.date?.let { dateFormat.parse(it) }
+                if (date != null) {
+                    calendar.time = date
+                }
             } catch (e: Exception) {
                 // Tangani kesalahan parsing jika diperlukan
                 e.printStackTrace()
@@ -30,20 +31,19 @@ class AlarmScheduler {
             }
 
             val intent = Intent(context, AlarmReceiver::class.java)
-            intent.putExtra(AlarmReceiver.EXTRA_MESSAGE, "It's time for your task: ${task.title}!")
+            intent.putExtra(AlarmReceiver.EXTRA_MESSAGE, "It's time for your workout: ${task.title}!")
             intent.putExtra(AlarmReceiver.EXTRA_TYPE, AlarmReceiver.TYPE_ONE_TIME)
 
-            // Menggunakan UUID untuk menghasilkan ID unik
-            val uniqueId = UUID.randomUUID().hashCode()
+            val requestCode = task.id.hashCode()  // ID unik dari task
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
-                uniqueId,
+                requestCode,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
             alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
-            Log.d("AlarmScheduler", "Alarm set for task '${task.title}' at ${calendar.time}")
+            Log.d("AlarmScheduler", "Alarm set for workout '${task.title}' at ${calendar.time}")
 
         }
     }

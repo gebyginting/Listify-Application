@@ -1,9 +1,22 @@
 package com.geby.listifyapplication.utils
 
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 object DateHelper {
+
+    fun getCurrentDateAndTime() : String {
+        val dateFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
+        val date = Date()
+        return dateFormat.format(date)
+    }
+
+    fun getCurrentDate(): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
+        return dateFormat.format(Date())
+    }
+
     fun formatDate(dateString: String?): String {
         if (dateString.isNullOrEmpty()) return ""
 

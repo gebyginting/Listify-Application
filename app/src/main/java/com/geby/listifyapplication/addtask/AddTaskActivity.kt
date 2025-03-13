@@ -1,18 +1,21 @@
 package com.geby.listifyapplication.addtask
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.geby.listifyapplication.HomeViewModel
 import com.geby.listifyapplication.database.Task
 import com.geby.listifyapplication.databinding.ActivityAddTaskBinding
+import com.geby.listifyapplication.utils.AlarmReceiver
 import com.geby.listifyapplication.utils.ViewModelFactory
 import com.geby.workoutreminderapp.ui.log.DatePickerFragment
 import com.geby.workoutreminderapp.ui.log.TimePickerFragment
-import com.geby.workoutreminderapp.utils.AlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -33,11 +36,27 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     private var scheduledTime = ""
     private var schedule: Date? = null
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+                Toast.makeText(this, "Notifications permission granted", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Notifications permission rejected", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityAddTaskBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (Build.VERSION.SDK_INT >= 33) {
+            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        alarmReceiver = AlarmReceiver()
 
         setSchedule()
         addTask()
@@ -67,7 +86,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                             type = AlarmReceiver.TYPE_ONE_TIME,
                             date = scheduledDate,
                             time = scheduledTime,
-                            message = "It's time to do your task: $title!"
+                            message = "It's time to do your new task: $title!"
                         )
 
                         showToast("Task berhasil ditambahkan")
@@ -92,7 +111,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                 val timePickerFragmentOne = TimePickerFragment()
                 timePickerFragmentOne.show(supportFragmentManager, TIME_PICKER_ONCE_TAG)
             }
-            alarmReceiver = AlarmReceiver()
+//            alarmReceiver = AlarmReceiver()
         }
     }
 
