@@ -31,13 +31,6 @@ class TaskRepository(application: Application) {
         executorService.execute { mTasksDao.update(task) }
     }
 
-//    fun markExpiredTasks() {
-//        val now = DateHelper.getCurrentDateAndTime()
-//        Log.d("tanggal:", now)
-//        mTasksDao.updateExpiredTasks(now)
-//    }
-
-
     fun delete(task: Task) {
         executorService.execute { mTasksDao.delete(task) }
     }

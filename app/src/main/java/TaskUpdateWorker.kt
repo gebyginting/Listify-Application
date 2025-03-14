@@ -1,5 +1,6 @@
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -15,6 +16,7 @@ class TaskUpdateWorker(context: Context, workerParams: WorkerParameters) : Worke
         val currentDate = SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH)
         taskDao.updateExpiredTasks(currentDate.toString())
         Log.d("Current Date: ", currentDate.toString())
+        applicationContext.contentResolver.notifyChange(Uri.parse("content://task-updated"), null)
 
         return Result.success()
     }

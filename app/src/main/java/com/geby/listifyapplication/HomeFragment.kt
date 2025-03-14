@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.geby.listifyapplication.addtask.AddTaskActivity
 import com.geby.listifyapplication.categorycards.CategoryCardAdapter
@@ -48,6 +49,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupSystemBars()
         scheduleTaskUpdate(requireContext())
+        setupTodayTaskList()
 
     }
 
@@ -62,7 +64,6 @@ class HomeFragment : Fragment() {
         setTotalTodayTask()
         setUpcomingTask()
         setupCategoryCards()
-        setupTodayTaskList()
         setupAddTaskButton()
         setupSeeAllTasksButton()
 
@@ -101,6 +102,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun setupTodayTaskList() {
         val adapter = TaskCardAdapter { selectedTask ->
             homeViewModel.update(selectedTask)
@@ -110,8 +112,19 @@ class HomeFragment : Fragment() {
 
         homeViewModel.getAllTasksByCategory("On Going").observe(viewLifecycleOwner) { taskList ->
             adapter.submitList(taskList.take(3))
+            adapter.notifyDataSetChanged()
             binding.tvNotaskmessage.visibility = if (taskList.isEmpty()) View.VISIBLE else View.GONE
         }
+
+
+        // WorkManager observer: Jika Worker selesai, perbarui data
+        WorkManager.getInstance(requireContext())
+            .getWorkInfosForUniqueWorkLiveData("TaskUpdateWorker")
+            .observe(viewLifecycleOwner) { workInfos ->
+                if (workInfos.any { it.state == WorkInfo.State.SUCCEEDED }) {
+                    homeViewModel.refreshTodayTasks() // Panggil ini untuk update otomatis
+                }
+            }
     }
 
     private fun setupAddTaskButton() {
@@ -184,7 +197,7 @@ class HomeFragment : Fragment() {
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "TaskUpdateWork",
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.REPLACE,
             workRequest
         )
     }

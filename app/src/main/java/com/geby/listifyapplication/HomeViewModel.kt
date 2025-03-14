@@ -2,6 +2,7 @@ package com.geby.listifyapplication
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import com.geby.listifyapplication.categorycards.CategoryCardData
@@ -11,6 +12,18 @@ import com.geby.listifyapplication.repository.TaskRepository
 class HomeViewModel(application: Application) : ViewModel() {
 
     private val mTaskRepository: TaskRepository = TaskRepository(application)
+    private val _todayTasks = MutableLiveData<List<Task>>()
+    val todayTasks: LiveData<List<Task>> get() = _todayTasks
+
+    init {
+        refreshTodayTasks()
+    }
+
+    fun refreshTodayTasks() {
+        mTaskRepository.getAllTasksByCategory("On Going").observeForever { taskList ->
+            _todayTasks.postValue(taskList.take(3))
+        }
+    }
 
     fun getAllTasksByCategory(status: String): LiveData<List<Task>> = mTaskRepository.getAllTasksByCategory(status)
 

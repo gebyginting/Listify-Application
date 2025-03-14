@@ -76,6 +76,11 @@ class TaskCardAdapter(
         }
     }
 
+    fun updateList(newList: List<Task>) {
+        submitList(newList) // Gunakan submitList() yang disediakan ListAdapter
+
+    }
+
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Task>() {
             override fun areItemsTheSame(oldItem: Task, newItem: Task): Boolean {
